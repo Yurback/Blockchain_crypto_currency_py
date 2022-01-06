@@ -8,6 +8,10 @@ open_transactions = []
 owner = 'Max'
 
 
+def hash_block(block):
+    return '-'.join(([str(block[key]) for key in block]))
+
+
 def get_last_blockchain_value():
     """ Returns the last value of the current blockchain"""
     if len(blockchain) < 1:
@@ -24,8 +28,8 @@ def add_transaction(recipient, sender=owner, amount=1.0):
         : amount: The amount of coins sent with the transaction (default = 1.0)
     """
     transaction = {
-        'sender': sender, 
-        'recipient': recipient, 
+        'sender': sender,
+        'recipient': recipient,
         'amount': amount
     }
     open_transactions.append(transaction)
@@ -33,11 +37,9 @@ def add_transaction(recipient, sender=owner, amount=1.0):
 
 def mine_block():
     last_block = blockchain[-1]
-    hashed_block = '-'.join(([str(last_block[key]) for key in last_block]))
-    print(hashed_block)
-
+    hashed_block = hash_block(last_block)
     block = {
-        'previos_hash': 'XYZ',
+        'previos_hash': hashed_block,
         'index': len(blockchain),
         'transactions': open_transactions
     }
@@ -48,7 +50,9 @@ def get_transaction_value():
     """ Returns the input of users."""
     tx_recipient = input('Enter the recipient of the transaction:')
     tx_amount = float(input('Your transaction amount please: '))
-    return (tx_recipient, tx_amount) # можно без скобок если больше 1 переменной
+    # можно без скобок если больше 1 переменной
+    return (tx_recipient, tx_amount)
+
 
 def get_user_choice():
     user_input = input('Your choice: ')
@@ -62,26 +66,12 @@ def print_blockchain_element():
 
 
 def verify_chain():
-    # block_index = 1
-    is_valid = True
-    for block_index in range(len(blockchain)):
-        if block_index == 0:
+    for (index, block) in enumerate(blockchain):
+        if index == 0:
             continue
-        elif blockchain[block_index][0] == blockchain[block_index - 1]:
-            is_valid = True
-        else:
-            is_valid = False
-            break
-    # for block in blockchain:
-    #     if block == blockchain[0]:
-    #         continue
-    #     if block[0] == blockchain[block_index -1]:
-    #         pass
-    #     else:
-    #         is_valid = False
-    #         break
-    #     block_index += 1
-    return is_valid
+        if block['previos_hash'] != hash_block(blockchain[index - 1]):
+            return False
+    return True
 
 
 while True:
@@ -102,14 +92,19 @@ while True:
         print_blockchain_element()
     elif user_choice == 'h':
         if len(blockchain) >= 1:
-            blockchain[0] = [2]
+            blockchain[0] = {
+                'previos_hash': '',
+                'index': 0,
+                'transactions': [{'sender':'Chris', 'recipient':'Max', 'amount':100}]
+            }
     elif user_choice == 'q':
         break
     else:
         print('Input was invalid, please pick a value from the list')
-    # if not verify_chain():
-    #     print('Invalid blockchain!')
-    #     break
+    if not verify_chain():
+        print_blockchain_element()
+        print('Invalid blockchain!')
+        break
 
 
 print('Done!')
