@@ -124,7 +124,7 @@ while True:
     print('2: Mine a new block')
     print('3: Output the blockchain blocks')
     print('4: Output participants')
-    print('5: Verify the transactions')
+    print('5: Check transactions validity')
     print('h: Маnipulate the chain')
     print('q: Quit')
     user_choice = get_user_choice()
